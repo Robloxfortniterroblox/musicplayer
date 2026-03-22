@@ -129,7 +129,8 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
 /* PLAYER BAR */
 #player-bar{grid-column:1/-1;grid-row:2;background:var(--bg1);border-top:1px solid var(--border);display:grid;grid-template-columns:260px 1fr 260px;align-items:center;padding:0 24px;gap:20px;}
 #now-playing{display:flex;align-items:center;gap:12px;overflow:hidden;min-width:0;}
-#album-art{width:52px;height:52px;border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--fg3);background:var(--bg);}
+#album-art{width:52px;height:52px;border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--fg3);background:var(--bg);overflow:hidden;}
+#album-art img{width:100%;height:100%;object-fit:cover;display:block;}
 #np-info{overflow:hidden;min-width:0;}
 #np-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #np-artist{font-size:11px;color:var(--fg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px;}
@@ -182,7 +183,8 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
   .mn-icon{font-size:22px;line-height:1;}
   #m-miniplayer{display:flex;position:fixed;left:0;right:0;bottom:calc(56px + var(--sb));height:64px;background:var(--bg1);border-top:1px solid var(--border);align-items:center;padding:0 0 0 14px;z-index:9;transform:translateY(100%);transition:transform .25s ease;}
   #m-miniplayer.visible{transform:translateY(0);}
-  #mmp-art{width:42px;height:42px;background:var(--bg);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--fg3);}
+  #mmp-art{width:42px;height:42px;background:var(--bg);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--fg3);overflow:hidden;}
+  #mmp-art img{width:100%;height:100%;object-fit:cover;display:block;}
   #mmp-info{flex:1;min-width:0;padding:0 12px;cursor:pointer;}
   #mmp-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   #mmp-artist{font-size:11px;color:var(--fg2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -196,7 +198,8 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
   #mfp-hdr{display:flex;align-items:center;height:52px;padding:0 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
   #mfp-close{background:none;border:none;color:var(--fg2);font-size:26px;padding:4px 10px;cursor:pointer;}
   #mfp-label{flex:1;text-align:center;font-size:11px;letter-spacing:.12em;color:var(--fg3);text-transform:uppercase;}
-  #mfp-art{width:min(64vw,260px);height:min(64vw,260px);margin:28px auto 20px;background:var(--bg1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:56px;color:var(--fg3);flex-shrink:0;}
+  #mfp-art{width:min(64vw,260px);height:min(64vw,260px);margin:28px auto 20px;background:var(--bg1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:56px;color:var(--fg3);flex-shrink:0;overflow:hidden;}
+  #mfp-art img{width:100%;height:100%;object-fit:cover;display:block;}
   #mfp-info{text-align:center;padding:0 24px;flex-shrink:0;}
   #mfp-name{font-size:19px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   #mfp-artist{font-size:13px;color:var(--fg2);margin-top:5px;}
@@ -340,7 +343,7 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
 <div id="desktop-shell">
   <div id="sidebar">
     <div class="sidebar-top">
-      <div class="app-title">music player🤑🤑 <button class="btn-lang" id="btn-lang">EN</button></div>
+      <div class="app-title">music player🤑🤑 <span id="app-version-badge" style="font-family:var(--mono);font-size:9px;color:var(--fg3);letter-spacing:.06em;cursor:default;"></span><button class="btn-lang" id="btn-lang">EN</button></div>
       <div class="import-zone" id="import-zone"><span class="dicon">⊕</span><span id="txt-drop-hint">déposer des fichiers ici</span><br><small style="color:var(--fg3)">mp3, wav, flac, ogg, aac…</small></div>
       <div class="import-btns">
         <button class="btn-imp" id="btn-files" data-i="btn-files">+ fichiers</button>
@@ -521,6 +524,7 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
     <h2 id="confirm-title"></h2>
     <p id="confirm-msg"></p>
     <input type="text" id="confirm-inp" placeholder="">
+    <select id="confirm-select" style="display:none;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--fg);font-family:var(--sans);font-size:13px;padding:9px 10px;outline:none;margin-bottom:16px;cursor:pointer;"></select>
     <div class="modal-acts" id="confirm-acts"></div>
   </div>
 </div>
@@ -599,7 +603,7 @@ const LANGS={
     'add-to-current':'Ajouter à la playlist actuelle',
     'gdrive-invalid':'Lien Google Drive invalide','gdrive-access':'Accès refusé (dossier privé)','gdrive-err':(c)=>`Erreur Drive (${c})`,'gdrive-batch':'Google Drive',
     'up-to-date':'Déjà à jour','update-check-failed':'Vérification impossible','no-changelog':'Pas de changelog',
-    'update-downloaded':'Mise à jour téléchargée — remplace ce fichier','retry':'Réessayer','update-dl-failed':'Téléchargement échoué',
+    'update-downloaded':'Mise à jour appliquée — rechargement…','retry':'Réessayer','update-dl-failed':'Téléchargement échoué',
     'export-done':'Sauvegarde exportée','import-save-done':(tr,pl)=>`${tr} titre${tr>1?'s':''}, ${pl} playlist${pl>1?'s':''} importé${tr>1?'s':''}`,
     'import-save-failed':'Fichier invalide','export-warning':'Les fichiers locaux devront être ré-importés sur le nouvel appareil.',
     'btn-update':'⟳ mise à jour','btn-export':'↑ exporter','btn-import-save':'↓ importer sauvegarde',
@@ -661,7 +665,7 @@ const LANGS={
     'add-to-current':'Add to current playlist',
     'gdrive-invalid':'Invalid Google Drive link','gdrive-access':'Access denied (folder is private)','gdrive-err':(c)=>`Drive error (${c})`,'gdrive-batch':'Google Drive',
     'up-to-date':'Already up to date','update-check-failed':'Update check failed','no-changelog':'No changelog available',
-    'update-downloaded':'Update downloaded — replace this file','retry':'Retry','update-dl-failed':'Download failed',
+    'update-downloaded':'Update applied — reloading…','retry':'Retry','update-dl-failed':'Download failed',
     'export-done':'Save exported','import-save-done':(tr,pl)=>`${tr} track${tr>1?'s':''}, ${pl} playlist${pl>1?'s':''} imported`,
     'import-save-failed':'Invalid save file','export-warning':'Local files will need to be re-imported on the new device.',
     'btn-update':'⟳ update','btn-export':'↑ export','btn-import-save':'↓ import save',
@@ -720,12 +724,13 @@ document.getElementById('btn-lang').onclick=toggleLang;
 let db;
 function openDB(){
   return new Promise((res,rej)=>{
-    const r=indexedDB.open('musicplayer_v3',1);
+    const r=indexedDB.open('musicplayer_v3',2);
     r.onupgradeneeded=e=>{
       const d=e.target.result;
       if(!d.objectStoreNames.contains('tracks'))d.createObjectStore('tracks',{keyPath:'id'});
       if(!d.objectStoreNames.contains('playlists'))d.createObjectStore('playlists',{keyPath:'id'});
       if(!d.objectStoreNames.contains('prefs'))d.createObjectStore('prefs');
+      if(!d.objectStoreNames.contains('art'))d.createObjectStore('art',{keyPath:'id'});
     };
     r.onsuccess=e=>{db=e.target.result;res();};
     r.onerror=()=>rej(r.error);
@@ -753,6 +758,122 @@ function toast(msg){const el=document.getElementById('toast');el.textContent=msg
 function lbar(p){const el=document.getElementById('lbar');el.style.width=p+'%';if(p>=100)setTimeout(()=>el.style.width='0%',500);}
 function getUrl(tk){if(urls[tk.id])return urls[tk.id];if(tk.fileBlob){urls[tk.id]=URL.createObjectURL(tk.fileBlob);return urls[tk.id];}return null;}
 
+// Cover art cache: trackId -> object URL string (or null if none)
+const artUrls={};
+
+async function extractCoverArt(blob){
+  // Reads ID3v2 tags from MP3/AAC, or ID3v2 embedded in other formats
+  try{
+    const buf=await blob.slice(0,256*1024).arrayBuffer(); // read first 256KB
+    const b=new Uint8Array(buf);
+    // ID3v2 header: "ID3" at offset 0
+    if(b[0]===0x49&&b[1]===0x44&&b[2]===0x33){
+      const ver=b[3];
+      const size=(b[6]&0x7f)<<21|(b[7]&0x7f)<<14|(b[8]&0x7f)<<7|(b[9]&0x7f);
+      let pos=10;
+      // ID3v2.2 uses 3-char frame IDs, v2.3/v2.4 use 4-char
+      const v22=ver===2;
+      while(pos<size+10&&pos<b.length-10){
+        const frameId=v22
+          ?String.fromCharCode(b[pos],b[pos+1],b[pos+2])
+          :String.fromCharCode(b[pos],b[pos+1],b[pos+2],b[pos+3]);
+        const frameSize=v22
+          ?(b[pos+3]<<16|b[pos+4]<<8|b[pos+5])
+          :(b[pos+4]<<24|b[pos+5]<<16|b[pos+6]<<8|b[pos+7]);
+        const frameDataStart=v22?pos+6:pos+10;
+        if(frameSize<=0||frameSize>200000)break;
+        if(frameId==='APIC'||frameId==='PIC'){
+          // APIC: text encoding(1) + mime(null-term) + pic type(1) + description(null-term) + data
+          let i=frameDataStart+1; // skip encoding byte
+          while(i<frameDataStart+frameSize&&b[i]!==0)i++; // skip mime
+          i++; // skip null terminator
+          i++; // skip picture type
+          while(i<frameDataStart+frameSize&&b[i]!==0)i++; // skip description
+          i++; // skip null terminator
+          const imgData=b.slice(i,frameDataStart+frameSize);
+          // Detect mime from magic bytes
+          let mime='image/jpeg';
+          if(imgData[0]===0x89&&imgData[1]===0x50)mime='image/png';
+          else if(imgData[0]===0x47&&imgData[1]===0x49)mime='image/gif';
+          else if(imgData[0]===0x57&&imgData[1]===0x45)mime='image/webp';
+          return URL.createObjectURL(new Blob([imgData],{type:mime}));
+        }
+        pos=frameDataStart+frameSize;
+      }
+    }
+    // FLAC: check for METADATA_BLOCK_PICTURE
+    if(b[0]===0x66&&b[1]===0x4c&&b[2]===0x61&&b[3]===0x43){
+      let pos=4;
+      while(pos<b.length-4){
+        const blockType=b[pos]&0x7f;
+        const isLast=b[pos]>>7;
+        const blockLen=b[pos+1]<<16|b[pos+2]<<8|b[pos+3];
+        pos+=4;
+        if(blockType===6){ // PICTURE
+          const view=new DataView(buf,pos,blockLen);
+          let o=0;
+          o+=4; // picture type
+          const mimeLen=view.getUint32(o);o+=4;
+          const mimeArr=b.slice(pos+o,pos+o+mimeLen);
+          const mime=String.fromCharCode(...mimeArr);o+=mimeLen;
+          const descLen=view.getUint32(o);o+=4+descLen;
+          o+=16; // width, height, depth, colors
+          const dataLen=view.getUint32(o);o+=4;
+          const imgData=b.slice(pos+o,pos+o+dataLen);
+          return URL.createObjectURL(new Blob([imgData],{type:mime}));
+        }
+        pos+=blockLen;
+        if(isLast)break;
+      }
+    }
+  }catch{}
+  return null;
+}
+
+async function loadArt(tk){
+  if(artUrls[tk.id]!==undefined)return artUrls[tk.id]; // already tried
+  // Check IndexedDB for stored art blob
+  const stored=await dbGet('art',tk.id).catch(()=>null);
+  if(stored&&stored.blob){
+    artUrls[tk.id]=URL.createObjectURL(stored.blob);
+    return artUrls[tk.id];
+  }
+  if(!tk.fileBlob){artUrls[tk.id]=null;return null;}
+  const url=await extractCoverArt(tk.fileBlob);
+  artUrls[tk.id]=url;
+  if(url){
+    // Store art blob in DB so it survives page reload
+    try{
+      const resp=await fetch(url);
+      const artBlob=await resp.blob();
+      await dbPut('art',{id:tk.id,blob:artBlob});
+    }catch{}
+  } else {
+    await dbPut('art',{id:tk.id,blob:null}).catch(()=>{});
+  }
+  return url;
+}
+
+function setArtEl(el,url,fallback='♪'){
+  if(url){
+    el.innerHTML=`<img src="${url}" alt="">`;
+  } else {
+    el.innerHTML=fallback;
+  }
+}
+
+async function updateArtDisplay(){
+  const tk=S.tracks.find(tk=>tk.id===S.currentId);
+  const url=tk?await loadArt(tk):null;
+  setArtEl(document.getElementById('album-art'),url,'♪');
+  setArtEl(document.getElementById('mmp-art'),url,'♪');
+  setArtEl(document.getElementById('mfp-art'),url,'♪');
+  // Also update media session artwork
+  if(tk&&url&&'mediaSession' in navigator){
+    navigator.mediaSession.metadata=new MediaMetadata({title:tk.name,artist:tk.artist,artwork:[{src:url}]});
+  }
+}
+
 async function loadFiles(files){
   const valid=[...files].filter(f=>/\.(mp3|wav|ogg|flac|aac|m4a|opus|weba|webm)$/i.test(f.name));
   if(!valid.length){toast(t('gh-no-audio'));return;}
@@ -771,7 +892,7 @@ async function loadFiles(files){
   lbar(55);let done=0;
   await Promise.all(added.map(tk=>new Promise(res=>{
     const a=new Audio();a.src=getUrl(tk);
-    a.addEventListener('loadedmetadata',async()=>{tk.duration=a.duration;await dbPut('tracks',{id:tk.id,name:tk.name,artist:tk.artist,duration:tk.duration,addedAt:tk.addedAt,fileBlob:tk.fileBlob,batchId:tk.batchId,batchLabel:tk.batchLabel});done++;lbar(55+(done/added.length)*40);renderBoth();res();},{once:true});
+    a.addEventListener('loadedmetadata',async()=>{tk.duration=a.duration;await dbPut('tracks',{id:tk.id,name:tk.name,artist:tk.artist,duration:tk.duration,addedAt:tk.addedAt,fileBlob:tk.fileBlob,batchId:tk.batchId,batchLabel:tk.batchLabel});done++;lbar(55+(done/added.length)*40);renderBoth();loadArt(tk);res();},{once:true});
     a.addEventListener('error',()=>res(),{once:true});
   })));
   lbar(100);if(S.queue.length===0)rebuildQueue();
@@ -909,9 +1030,10 @@ async function loadFromOneDrive(url){
   renderBoth();updateCounts();
   return added;
 }
-const UPDATE_VERSION_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/songs/main/version.txt';
-const UPDATE_CHANGELOG_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/songs/main/changelog.txt';
-const UPDATE_FILE_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/songs/main/music_player.html';
+const APP_VERSION='1.0.1';
+const UPDATE_VERSION_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main/version.txt';
+const UPDATE_CHANGELOG_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main/changelog.txt';
+const UPDATE_FILE_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main/MUSIC%20PLAYER%20APP.html';
 
 function semverGt(a,b){
   const pa=a.trim().replace(/^v/,'').split('.').map(Number);
@@ -937,29 +1059,57 @@ async function checkForUpdate(silent=false){
 function showUpdateModal(version,changelog){
   document.getElementById('upd-version').textContent=version;
   document.getElementById('upd-changelog').textContent=changelog||t('no-changelog');
+  // Also show current version in modal for comparison
+  const curLine=document.getElementById('upd-version-line');
+  curLine.innerHTML=`v<span id="upd-version">${version}</span> <span style="color:var(--fg3)">(${LANG==='fr'?'actuel':'current'}: v${APP_VERSION})</span>`;
   document.getElementById('upd-modal-ov').classList.add('open');
 }
 
 document.getElementById('upd-cancel').onclick=()=>document.getElementById('upd-modal-ov').classList.remove('open');
 document.getElementById('upd-download').onclick=async()=>{
-  document.getElementById('upd-download').textContent='…';
+  const btn=document.getElementById('upd-download');
+  btn.textContent='…';btn.disabled=true;
   try{
     const resp=await fetch(UPDATE_FILE_URL+'?_='+Date.now());
     if(!resp.ok)throw new Error('Download failed');
-    const blob=await resp.blob();
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='music_player.html';a.click();
-    toast(t('update-downloaded'));document.getElementById('upd-modal-ov').classList.remove('open');
-  }catch{document.getElementById('upd-download').textContent=t('retry');toast(t('update-dl-failed'));}
+    const newHTML=await resp.text();
+
+    // 1. Save file to disk so the on-disk copy is updated too
+    const blob=new Blob([newHTML],{type:'text/html'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MUSIC PLAYER APP.html';a.click();
+
+    // 2. Overwrite the live page with the new code — DB survives because file path is unchanged
+    // Small delay so the download has time to trigger before the page is replaced
+    setTimeout(()=>{
+      document.open();
+      document.write(newHTML);
+      document.close();
+    },400);
+
+  }catch{
+    btn.disabled=false;
+    btn.textContent=t('retry');
+    toast(t('update-dl-failed'));
+  }
 };
 
 async function exportSave(){
+  // Export all tracks (without blobs) + playlists + prefs as a self-describing save
+  const prefs=await dbGet('prefs','main');
   const tracks=S.tracks.map(tk=>({
     id:tk.id,name:tk.name,artist:tk.artist,duration:tk.duration,
     addedAt:tk.addedAt,batchId:tk.batchId,batchLabel:tk.batchLabel,
     sourceUrl:tk.sourceUrl||null,
     isLocal:!tk.sourceUrl,
   }));
-  const data={version:APP_VERSION,exportedAt:Date.now(),tracks,playlists:S.playlists};
+  const data={
+    _format:'musicplayer-save-v2',
+    appVersion:APP_VERSION,
+    exportedAt:Date.now(),
+    prefs:prefs||null,
+    tracks,
+    playlists:S.playlists
+  };
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=`musicplayer-save-${new Date().toISOString().slice(0,10)}.json`;a.click();
@@ -971,6 +1121,15 @@ async function importSave(file){
     const text=await file.text();
     const data=JSON.parse(text);
     if(!data.tracks||!data.playlists)throw new Error('Invalid save file');
+    // Restore prefs if present (v2 format)
+    if(data.prefs){
+      const p=data.prefs;
+      if(p.shuffle!==undefined)S.shuffle=p.shuffle;
+      if(p.loop!==undefined)S.loop=p.loop;
+      if(p.volume!==undefined){S.volume=p.volume;aud.volume=S.volume;document.getElementById('vol-slider').value=S.volume;}
+      if(p.view!==undefined)S.view=p.view;
+      await savePrefs();
+    }
     const existingIds=new Set(S.tracks.map(tk=>tk.id));
     let importedTracks=0,importedPls=0;
     for(const tk of data.tracks){
@@ -1004,57 +1163,86 @@ async function promptSaveAsPlaylist(added,source){
   const rawLabel=added[0]&&added[0].batchLabel?added[0].batchLabel:t('save-as-pl-ph');
   const suggestedName=uniquePlName(rawLabel);
 
+  if(S.playlists.length===0){
+    // No playlists yet — ask to create one with a name
+    const name=await confirm2({
+      title:t('save-import-title'),
+      msg:t('save-import-msg',added.length),
+      inputPlaceholder:suggestedName,
+      yes:t('save-import-yes'),
+      no:t('save-import-no'),
+    });
+    if(name){await mkPl(name,added.map(tk=>tk.id));toast(t('playlist-created',name));}
+    return;
+  }
+
+  // Build choices: currently-open playlist first, then all others, then "new playlist", then cancel
   const inPlaylist=S.playlists.find(p=>p.id===S.view);
-
-  if(inPlaylist){
-    const choice=await multiChoice({
-      title:t('save-import-title'),
-      msg:t('save-import-msg',added.length),
-      choices:[
-        {id:'current',label:`${t('add-to-current')} "${inPlaylist.name}"`},
-        {id:'new',label:t('save-import-yes')},
-        {id:'none',label:t('save-import-no')},
-      ]
-    });
-    if(choice==='current'){
-      added.forEach(tk=>{if(!inPlaylist.trackIds.includes(tk.id))inPlaylist.trackIds.push(tk.id);});
-      await savePl(inPlaylist);renderSidebar();toast(t('playlist-created',inPlaylist.name));
-    } else if(choice==='new'){
-      const name=await modal(t('new-playlist'),t('pl-name-ph'),suggestedName);
-      if(name){await mkPl(name,added.map(tk=>tk.id));toast(t('playlist-created',name));}
-    }
-    return;
-  }
-
-  if(S.playlists.length>0){
-    const choice=await multiChoice({
-      title:t('save-import-title'),
-      msg:t('save-import-msg',added.length),
-      choices:[
-        {id:'new',label:t('save-import-yes')},
-        ...S.playlists.map(p=>({id:'pl:'+p.id,label:`${t('add-to')}${p.name}`})),
-        {id:'none',label:t('save-import-no')},
-      ]
-    });
-    if(choice==='new'){
-      const name=await modal(t('new-playlist'),t('pl-name-ph'),suggestedName);
-      if(name){await mkPl(name,added.map(tk=>tk.id));toast(t('playlist-created',name));}
-    } else if(choice&&choice.startsWith('pl:')){
-      const pid=+choice.slice(3);
-      const pl=S.playlists.find(p=>p.id===pid);
-      if(pl){added.forEach(tk=>{if(!pl.trackIds.includes(tk.id))pl.trackIds.push(tk.id);});await savePl(pl);renderSidebar();toast(t('playlist-created',pl.name));}
-    }
-    return;
-  }
-
-  const name=await confirm2({
+  const choice=await playlistDropdownChoice({
     title:t('save-import-title'),
     msg:t('save-import-msg',added.length),
-    inputPlaceholder:suggestedName,
-    yes:t('save-import-yes'),
-    no:t('save-import-no'),
+    playlists:S.playlists,
+    currentPlaylistId:inPlaylist?inPlaylist.id:null,
+    newLabel:t('save-import-yes'),
+    cancelLabel:t('save-import-no'),
   });
-  if(name){await mkPl(name,added.map(tk=>tk.id));toast(t('playlist-created',name));}
+
+  if(!choice||choice==='none')return;
+  if(choice==='new'){
+    const name=await modal(t('new-playlist'),t('pl-name-ph'),suggestedName);
+    if(name){await mkPl(name,added.map(tk=>tk.id));toast(t('playlist-created',name));}
+  } else {
+    const pid=+choice;
+    const pl=S.playlists.find(p=>p.id===pid);
+    if(pl){added.forEach(tk=>{if(!pl.trackIds.includes(tk.id))pl.trackIds.push(tk.id);});await savePl(pl);renderSidebar();toast(t('playlist-created',pl.name));}
+  }
+}
+
+// Shows the confirm modal with a <select> dropdown of playlists
+function playlistDropdownChoice({title,msg,playlists,currentPlaylistId,newLabel,cancelLabel}){
+  document.getElementById('confirm-title').textContent=title;
+  document.getElementById('confirm-msg').textContent=msg;
+  document.getElementById('confirm-inp').className=''; // hide text input
+
+  const sel=document.getElementById('confirm-select');
+  sel.style.display='block';
+  sel.innerHTML='';
+
+  // "Add to current playlist" option first if user is inside one
+  if(currentPlaylistId!=null){
+    const cur=playlists.find(p=>p.id===currentPlaylistId);
+    if(cur){
+      const o=document.createElement('option');
+      o.value=currentPlaylistId;
+      o.textContent=`${t('add-to-current')} "${esc(cur.name)}"`;
+      o.selected=true;
+      sel.appendChild(o);
+    }
+  }
+  // All other playlists
+  playlists.forEach(p=>{
+    if(p.id===currentPlaylistId)return; // already added above
+    const o=document.createElement('option');
+    o.value=p.id;
+    o.textContent=`${t('add-to')}${esc(p.name)}`;
+    sel.appendChild(o);
+  });
+  // "New playlist" option
+  const onew=document.createElement('option');
+  onew.value='new';onew.textContent=`+ ${newLabel}`;
+  sel.appendChild(onew);
+
+  const acts=document.getElementById('confirm-acts');acts.innerHTML='';acts.style.flexDirection='';
+  document.getElementById('confirm-ov').classList.add('open');
+
+  return new Promise(r=>{
+    const noBtn=document.createElement('button');noBtn.className='mbtn';noBtn.textContent=cancelLabel||t('cancel');
+    const yesBtn=document.createElement('button');yesBtn.className='mbtn pri';yesBtn.textContent='OK';
+    acts.appendChild(noBtn);acts.appendChild(yesBtn);
+    const close=val=>{sel.style.display='none';document.getElementById('confirm-ov').classList.remove('open');r(val);};
+    noBtn.onclick=()=>close('none');
+    yesBtn.onclick=()=>close(sel.value);
+  });
 }
 
 function viewIds(){
@@ -1295,7 +1483,7 @@ function updateAll(){
   document.getElementById('mfp-shuffle').classList.toggle('active',S.shuffle);
   const mfl=document.getElementById('mfp-loop');mfl.classList.toggle('active',S.loop!=='none');mfl.textContent=S.loop==='one'?'↺¹':'↺';
   document.getElementById('mfp-vol-sl').value=S.volume;
-  updateMediaSession();renderBoth();
+  updateMediaSession();updateArtDisplay();renderBoth();
 }
 
 function setView(v){
@@ -1649,6 +1837,9 @@ async function init(){
   if(S.tracks.length)_tid=Math.max(...S.tracks.map(tk=>tk.id))+1;
   if(S.playlists.length)_pid=Math.max(...S.playlists.map(p=>p.id))+1;
   applyLang();rebuildQueue();setView(S.view);updateAll();renderSidebar();updateCounts();
+  // Show version badge
+  const vbadge=document.getElementById('app-version-badge');
+  if(vbadge)vbadge.textContent='v'+APP_VERSION;
   if(navigator.onLine)setTimeout(()=>checkForUpdate(true),2000);
 }
 init();
