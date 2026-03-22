@@ -627,7 +627,7 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
 <audio id="aud" playsinline></audio>
 
 <script>
-const APP_VERSION = '1.0.7';
+const APP_VERSION = '1.0.8';
 const UPDATE_REPO  = 'https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main';
 const UPDATE_FILE_URL = UPDATE_REPO+'/MUSIC%20PLAYER%20APP.html';
 
@@ -882,18 +882,29 @@ async function loadFiles(files){
     a.src=urls[tk.id];
     a.addEventListener('loadedmetadata',()=>{
       tk.duration=a.duration;
-      done++;lbar(30+(done/added.length)*65);
+      done++;lbar(30+(done/added.length)*50);
       renderBoth();res();
     },{once:true});
     a.addEventListener('error',()=>res(),{once:true});
     a.load();
   })));
-  lbar(100);
+  lbar(80);
   if(S.queue.length===0)rebuildQueue();
   renderBoth();updateCounts();
   toast(t('added-n',added.length));
   localStorage.removeItem('restore-dismissed');
   await promptSaveAsPlaylist(added,'local');
+  saveTracksToIDB(added);
+}
+
+function saveTracksToIDB(tracks){
+  tracks.reduce((chain,tk)=>chain.then(async()=>{
+    try{
+      const buf=await tk.fileBlob.arrayBuffer();
+      const blob=new Blob([buf],{type:tk.fileBlob.type||'audio/mpeg'});
+      await dbPut('tracks',{id:tk.id,name:tk.name,artist:tk.artist,duration:tk.duration,addedAt:tk.addedAt,fileBlob:blob,batchId:tk.batchId,batchLabel:tk.batchLabel});
+    }catch(e){}
+  }),Promise.resolve());
 }
 
 async function savePrefs(){await dbPut('prefs',{shuffle:S.shuffle,loop:S.loop,volume:S.volume,currentId:S.currentId,view:S.view},'main');}
