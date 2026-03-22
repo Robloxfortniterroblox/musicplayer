@@ -627,7 +627,7 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
 <audio id="aud" playsinline></audio>
 
 <script>
-const APP_VERSION = '1.0.8';
+const APP_VERSION = '1.0.9';
 const UPDATE_REPO  = 'https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main';
 const UPDATE_FILE_URL = UPDATE_REPO+'/MUSIC%20PLAYER%20APP.html';
 
@@ -868,43 +868,23 @@ async function loadFiles(files){
   const folderName=folderPaths.length?folderPaths[0].split('/')[0]:null;
   const batchLabel=folderName?folderName:uniquePlName(t('local-batch'));
   for(let i=0;i<valid.length;i++){
-    const f=valid[i];
-    const raw=f.name.replace(/\.[^.]+$/,'');
-    const{artist,name}=guess(raw);
-    const id=++_tid;
-    urls[id]=URL.createObjectURL(f);
+    const f=valid[i],raw=f.name.replace(/\.[^.]+$/,'');
+    const{artist,name}=guess(raw);const id=++_tid;
     const tk={id,name,artist,duration:0,addedAt:Date.now(),fileBlob:f,batchId,batchLabel};
-    S.tracks.push(tk);added.push(tk);
+    S.tracks.push(tk);added.push(tk);lbar(10+(i/valid.length)*40);
   }
-  lbar(30);let done=0;
+  for(const tk of added)await dbPut('tracks',{id:tk.id,name:tk.name,artist:tk.artist,duration:tk.duration,addedAt:tk.addedAt,fileBlob:tk.fileBlob,batchId:tk.batchId,batchLabel:tk.batchLabel});
+  lbar(55);let done=0;
   await Promise.all(added.map(tk=>new Promise(res=>{
-    const a=new Audio();
-    a.src=urls[tk.id];
-    a.addEventListener('loadedmetadata',()=>{
-      tk.duration=a.duration;
-      done++;lbar(30+(done/added.length)*50);
-      renderBoth();res();
-    },{once:true});
+    const a=new Audio();a.src=getUrl(tk);
+    a.addEventListener('loadedmetadata',async()=>{tk.duration=a.duration;await dbPut('tracks',{id:tk.id,name:tk.name,artist:tk.artist,duration:tk.duration,addedAt:tk.addedAt,fileBlob:tk.fileBlob,batchId:tk.batchId,batchLabel:tk.batchLabel});done++;lbar(55+(done/added.length)*40);renderBoth();res();},{once:true});
     a.addEventListener('error',()=>res(),{once:true});
-    a.load();
   })));
-  lbar(80);
-  if(S.queue.length===0)rebuildQueue();
+  lbar(100);if(S.queue.length===0)rebuildQueue();
   renderBoth();updateCounts();
   toast(t('added-n',added.length));
   localStorage.removeItem('restore-dismissed');
   await promptSaveAsPlaylist(added,'local');
-  saveTracksToIDB(added);
-}
-
-function saveTracksToIDB(tracks){
-  tracks.reduce((chain,tk)=>chain.then(async()=>{
-    try{
-      const buf=await tk.fileBlob.arrayBuffer();
-      const blob=new Blob([buf],{type:tk.fileBlob.type||'audio/mpeg'});
-      await dbPut('tracks',{id:tk.id,name:tk.name,artist:tk.artist,duration:tk.duration,addedAt:tk.addedAt,fileBlob:blob,batchId:tk.batchId,batchLabel:tk.batchLabel});
-    }catch(e){}
-  }),Promise.resolve());
 }
 
 async function savePrefs(){await dbPut('prefs',{shuffle:S.shuffle,loop:S.loop,volume:S.volume,currentId:S.currentId,view:S.view},'main');}
