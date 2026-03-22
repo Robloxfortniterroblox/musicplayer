@@ -317,45 +317,6 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
 .track-row.missing{opacity:.5;}
 .track-row.missing .t-name::after{content:' ⚠';color:#e05;font-size:10px;}
 
-#m-amerigo-sheet{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.82);z-index:60;
-  align-items:flex-end;
-}
-#m-amerigo-sheet.open{display:flex;}
-#m-amerigo-inner{
-  background:var(--bg1);border-top:1px solid var(--bhi);
-  width:100%;padding-bottom:calc(16px + var(--sb));
-  animation:sheetUp .22s cubic-bezier(.4,0,.2,1);
-}
-#m-amerigo-hdr{
-  display:flex;align-items:center;gap:12px;
-  padding:16px 20px 12px;border-bottom:1px solid var(--border);
-  font-size:14px;font-weight:600;
-}
-#m-amerigo-close{background:none;border:none;color:var(--fg2);font-size:20px;cursor:pointer;padding:2px;}
-#m-amerigo-body{padding:16px 20px;}
-.amerigo-step{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;font-size:14px;color:var(--fg2);line-height:1.5;}
-.amerigo-n{width:24px;height:24px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--fg3);flex-shrink:0;margin-top:1px;}
-#m-amerigo-open{display:block;width:calc(100% - 40px);margin:4px 20px 8px;padding:14px;font-size:14px;text-align:center;}
-#m-amerigo-cancel{display:block;width:calc(100% - 40px);margin:0 20px;}
-
-#restore-banner{
-  display:none;position:fixed;top:0;left:0;right:0;z-index:85;
-  background:var(--bg1);border-bottom:2px solid var(--bhi);
-  padding:14px 16px;gap:12px;align-items:center;
-  padding-top:calc(14px + var(--st));
-}
-#restore-banner.show{display:flex;}
-#restore-banner p{flex:1;font-size:12px;color:var(--fg2);line-height:1.5;}
-#restore-banner p strong{color:var(--fg);display:block;margin-bottom:2px;}
-.rb-btn{background:var(--fg);color:var(--bg);border:none;font-family:var(--mono);font-size:11px;padding:8px 14px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
-.rb-dis{background:none;border:none;color:var(--fg3);font-size:20px;cursor:pointer;padding:4px;flex-shrink:0;}
-
-@media(max-width:680px){
-  #m-shell.has-restore-banner{padding-top:calc(52px + var(--st) + 80px);}
-}
-
 #ctx{display:none;position:fixed;background:var(--bg1);border:1px solid var(--bhi);z-index:200;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,.7);animation:ctxIn .1s ease;}
 @keyframes ctxIn{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:none;}}
 #ctx.open{display:block;}
@@ -513,7 +474,6 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
     <button class="mi-row" id="mi-folder"><span class="mi-ico">📁</span><span data-i="choose-folder">Choisir un dossier</span></button>
     <button class="mi-row" id="mi-github"><span class="mi-ico">⬡</span><span data-i="import-github">Importer depuis GitHub</span></button>
     <button class="mi-row" id="mi-onedrive"><span class="mi-ico">☁</span><span data-i="import-onedrive">Importer depuis OneDrive</span></button>
-    <button class="mi-row" id="mi-amerigo"><span class="mi-ico">📱</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px"><span data-i="import-amerigo">Amerigo / Fichiers iOS</span><span style="font-size:11px;color:var(--fg3)" data-i="import-amerigo-hint">Parcourir → Sur mon iPhone → Amerigo</span></div></button>
     <details style="width:100%">
       <summary class="mi-row" style="list-style:none;display:flex;align-items:center;gap:16px;cursor:pointer;padding:15px 0;border-top:1px solid var(--border);color:var(--fg2);font-size:15px;font-family:var(--sans);background:none;border-left:none;border-right:none;border-bottom:none;"><span style="font-size:24px;width:32px;text-align:center;flex-shrink:0">···</span><span data-i="more-tools">plus d'options</span></summary>
       <button class="mi-row" id="mi-check-update" style="padding-left:16px;"><span class="mi-ico">⟳</span><span data-i="btn-update">mise à jour</span></button>
@@ -521,23 +481,6 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
       <button class="mi-row" id="mi-import-save" style="padding-left:16px;"><span class="mi-ico">↓</span><span data-i="btn-import-save">importer sauvegarde</span></button>
     </details>
     <button class="mi-cancel" id="mi-cancel" data-i="cancel">Annuler</button>
-  </div>
-</div>
-
-<div id="m-amerigo-sheet">
-  <div id="m-amerigo-inner">
-    <div id="m-amerigo-hdr">
-      <button id="m-amerigo-close">✕</button>
-      <span data-i="import-amerigo">Amerigo / Fichiers iOS</span>
-    </div>
-    <div id="m-amerigo-body">
-      <div class="amerigo-step"><span class="amerigo-n">1</span><span data-i="amerigo-s1">Appuie sur <b>Ouvrir le sélecteur</b> ci-dessous</span></div>
-      <div class="amerigo-step"><span class="amerigo-n">2</span><span data-i="amerigo-s2">Dans la fenêtre, appuie sur <b>Parcourir</b> (en bas)</span></div>
-      <div class="amerigo-step"><span class="amerigo-n">3</span><span data-i="amerigo-s3">Va dans <b>Sur mon iPhone</b> → <b>Amerigo</b></span></div>
-      <div class="amerigo-step"><span class="amerigo-n">4</span><span data-i="amerigo-s4">Sélectionne tes fichiers mp3</span></div>
-    </div>
-    <button id="m-amerigo-open" class="mbtn pri" data-i="amerigo-open">Ouvrir le sélecteur de fichiers</button>
-    <button id="m-amerigo-cancel" class="mi-cancel" data-i="cancel">Annuler</button>
   </div>
 </div>
 
@@ -570,12 +513,6 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
   <button class="ib-dis" id="install-dismiss">✕</button>
 </div>
 
-<div id="restore-banner">
-  <p><strong data-i="restore-title">Données manquantes ?</strong><span data-i="restore-desc">Importe ta sauvegarde pour récupérer tes playlists</span></p>
-  <button class="rb-btn" id="restore-btn" data-i="restore-btn">Importer</button>
-  <button class="rb-dis" id="restore-dismiss">✕</button>
-</div>
-
 <div id="drop-ov"><div class="dbig">🤑</div><p data-i="drop-here">lâcher pour ajouter</p></div>
 <div id="modal-ov"><div id="modal"><h2 id="modal-title"></h2><input type="text" id="modal-inp" placeholder="Nom…"><div class="modal-acts"><button class="mbtn" id="modal-cancel" data-i="cancel">Annuler</button><button class="mbtn pri" id="modal-ok">OK</button></div></div></div>
 
@@ -602,35 +539,20 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
 <div id="upd-modal-ov"><div id="upd-modal">
   <h2 data-i="upd-title">Mise à jour disponible</h2>
   <p id="upd-version-line" style="font-size:12px;color:var(--fg2);margin-bottom:8px;">v<span id="upd-version"></span></p>
-  <pre id="upd-changelog" style="font-size:11px;color:var(--fg2);max-height:140px;overflow-y:auto;background:var(--bg);padding:10px;margin-bottom:16px;white-space:pre-wrap;font-family:var(--mono);border:1px solid var(--border);"></pre>
-
-  <div id="upd-step-backup">
-    <div style="background:var(--bg2);border:1px solid var(--bhi);padding:14px;margin-bottom:16px;">
-      <p style="font-size:12px;font-weight:600;margin-bottom:6px;" data-i="upd-backup-required">⚠ Sauvegarde requise avant la mise à jour</p>
-      <p style="font-size:11px;color:var(--fg2);line-height:1.6;" data-i="upd-backup-why">Après la mise à jour, tu devras ouvrir le nouveau fichier. Tes données locales ne seront pas transférées automatiquement — exporte ta sauvegarde maintenant pour les récupérer.</p>
-    </div>
-    <div class="modal-acts">
-      <button class="mbtn" id="upd-cancel" data-i="cancel">Annuler</button>
-      <button class="mbtn pri" id="upd-do-backup" data-i="upd-do-backup">↑ Exporter la sauvegarde</button>
-    </div>
-    <p id="upd-backup-done-msg" style="display:none;font-size:11px;color:var(--fg2);margin-top:10px;text-align:center;" data-i="upd-backup-done-hint">Sauvegarde exportée ✓ — tu peux maintenant télécharger la mise à jour</p>
-    <div class="modal-acts" style="margin-top:8px;display:none;" id="upd-download-row">
-      <button class="mbtn pri" id="upd-download" data-i="upd-install">↓ Télécharger la mise à jour</button>
-    </div>
+  <pre id="upd-changelog" style="font-size:11px;color:var(--fg2);max-height:160px;overflow-y:auto;background:var(--bg);padding:10px;margin-bottom:16px;white-space:pre-wrap;font-family:var(--mono);"></pre>
+  <div class="modal-acts">
+    <button class="mbtn" id="upd-cancel" data-i="cancel">Annuler</button>
+    <button class="mbtn pri" id="upd-download" data-i="upd-install">Télécharger</button>
   </div>
 </div></div>
 
 <div id="ctx"></div>
 <div id="toast"></div>
-<input type="file" id="file-inp" multiple accept=".mp3,.wav,.ogg,.flac,.aac,.m4a,.opus,.weba,.webm" style="display:none">
-<input type="file" id="folder-inp" multiple webkitdirectory style="display:none">
+<input type="file" id="file-inp" multiple accept="audio/*" style="display:none">
+<input type="file" id="folder-inp" multiple webkitdirectory accept="audio/*" style="display:none">
 <audio id="aud" playsinline></audio>
 
 <script>
-const APP_VERSION = '1.0.9';
-const UPDATE_REPO  = 'https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main';
-const UPDATE_FILE_URL = UPDATE_REPO+'/MUSIC%20PLAYER%20APP.html';
-
 const LANGS={
   fr:{
     'btn-files':'+ fichiers','btn-folder':'+ dossier','nav-all':'toute la musique',
@@ -681,11 +603,7 @@ const LANGS={
     'export-done':'Sauvegarde exportée','import-save-done':(tr,pl)=>`${tr} titre${tr>1?'s':''}, ${pl} playlist${pl>1?'s':''} importé${tr>1?'s':''}`,
     'import-save-failed':'Fichier invalide','export-warning':'Les fichiers locaux devront être ré-importés sur le nouvel appareil.',
     'btn-update':'⟳ mise à jour','btn-export':'↑ exporter','btn-import-save':'↓ importer sauvegarde',
-    'upd-title':'Mise à jour disponible','upd-install':'↓ Télécharger la mise à jour',
-    'upd-do-backup':'↑ Exporter la sauvegarde',
-    'upd-backup-required':'⚠ Sauvegarde requise avant la mise à jour',
-    'upd-backup-why':"Après la mise à jour, tu devras ouvrir le nouveau fichier. Tes données locales ne seront pas transférées automatiquement — exporte ta sauvegarde maintenant pour les récupérer.",
-    'upd-backup-done-hint':'Sauvegarde exportée ✓ — tu peux maintenant télécharger la mise à jour','missing-file':'fichier manquant — ré-importer',
+    'upd-title':'Mise à jour disponible','upd-install':'Télécharger','missing-file':'fichier manquant — ré-importer',
     'gdrive-url-ph':'https://drive.google.com/drive/folders/...',
     'import-gdrive':'Importer depuis Google Drive',
     'gdrive-desc':'Lien vers un dossier Google Drive partagé publiquement. Le dossier doit être accessible à tous.',
@@ -696,16 +614,6 @@ const LANGS={
     'onedrive-no-audio':'Aucun fichier audio dans ce dossier OneDrive',
     'onedrive-already':'Ces fichiers sont déjà importés',
     'onedrive-url-ph':'https://onedrive.live.com/...',
-    'import-amerigo':'Amerigo / Fichiers iOS',
-    'import-amerigo-hint':'Parcourir → Sur mon iPhone → Amerigo',
-    'amerigo-s1':'Appuie sur <b>Ouvrir le sélecteur</b> ci-dessous',
-    'amerigo-s2':'Dans la fenêtre, appuie sur <b>Parcourir</b> (en bas)',
-    'amerigo-s3':'Va dans <b>Sur mon iPhone</b> → <b>Amerigo</b>',
-    'amerigo-s4':'Sélectionne tes fichiers mp3',
-    'amerigo-open':'Ouvrir le sélecteur de fichiers',
-    'restore-title':'Données manquantes ?',
-    'restore-desc':'Importe ta sauvegarde pour récupérer tes playlists et morceaux GitHub/OneDrive',
-    'restore-btn':'Importer sauvegarde',
     'more-tools':'··· plus d\'options',
   },
   en:{
@@ -757,11 +665,7 @@ const LANGS={
     'export-done':'Save exported','import-save-done':(tr,pl)=>`${tr} track${tr>1?'s':''}, ${pl} playlist${pl>1?'s':''} imported`,
     'import-save-failed':'Invalid save file','export-warning':'Local files will need to be re-imported on the new device.',
     'btn-update':'⟳ update','btn-export':'↑ export','btn-import-save':'↓ import save',
-    'upd-title':'Update available','upd-install':'↓ Download update',
-    'upd-do-backup':'↑ Export save file',
-    'upd-backup-required':'⚠ Backup required before updating',
-    'upd-backup-why':'After updating, you will need to open the new file. Your local data will not transfer automatically — export your save now so you can restore it.',
-    'upd-backup-done-hint':'Save exported ✓ — you can now download the update','missing-file':'missing file — re-import',
+    'upd-title':'Update available','upd-install':'Download','missing-file':'missing file — re-import',
     'gdrive-url-ph':'https://drive.google.com/drive/folders/...',
     'import-gdrive':'Import from Google Drive',
     'gdrive-desc':'Link to a publicly shared Google Drive folder. The folder must be accessible to anyone.',
@@ -772,16 +676,6 @@ const LANGS={
     'onedrive-no-audio':'No audio files in this OneDrive folder',
     'onedrive-already':'These files are already imported',
     'onedrive-url-ph':'https://onedrive.live.com/...',
-    'import-amerigo':'Amerigo / iOS Files',
-    'import-amerigo-hint':'Browse → On My iPhone → Amerigo',
-    'amerigo-s1':'Tap <b>Open file picker</b> below',
-    'amerigo-s2':'In the window, tap <b>Browse</b> (bottom)',
-    'amerigo-s3':'Go to <b>On My iPhone</b> → <b>Amerigo</b>',
-    'amerigo-s4':'Select your mp3 files',
-    'amerigo-open':'Open file picker',
-    'restore-title':'Missing data?',
-    'restore-desc':'Import your save to recover your playlists and GitHub/OneDrive tracks',
-    'restore-btn':'Import save',
     'more-tools':'··· more options',
   }
 };
@@ -883,7 +777,6 @@ async function loadFiles(files){
   lbar(100);if(S.queue.length===0)rebuildQueue();
   renderBoth();updateCounts();
   toast(t('added-n',added.length));
-  localStorage.removeItem('restore-dismissed');
   await promptSaveAsPlaylist(added,'local');
 }
 
@@ -1016,8 +909,9 @@ async function loadFromOneDrive(url){
   renderBoth();updateCounts();
   return added;
 }
-const UPDATE_VERSION_URL=UPDATE_REPO+'/version.txt';
-const UPDATE_CHANGELOG_URL=UPDATE_REPO+'/changelog.txt';
+const UPDATE_VERSION_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/songs/main/version.txt';
+const UPDATE_CHANGELOG_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/songs/main/changelog.txt';
+const UPDATE_FILE_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/songs/main/music_player.html';
 
 function semverGt(a,b){
   const pa=a.trim().replace(/^v/,'').split('.').map(Number);
@@ -1043,25 +937,10 @@ async function checkForUpdate(silent=false){
 function showUpdateModal(version,changelog){
   document.getElementById('upd-version').textContent=version;
   document.getElementById('upd-changelog').textContent=changelog||t('no-changelog');
-  document.getElementById('upd-backup-done-msg').style.display='none';
-  document.getElementById('upd-download-row').style.display='none';
-  document.getElementById('upd-do-backup').textContent=t('upd-do-backup');
-  document.getElementById('upd-do-backup').disabled=false;
   document.getElementById('upd-modal-ov').classList.add('open');
 }
 
-document.getElementById('upd-cancel').onclick=()=>{
-  document.getElementById('upd-modal-ov').classList.remove('open');
-  document.getElementById('upd-backup-done-msg').style.display='none';
-  document.getElementById('upd-download-row').style.display='none';
-};
-document.getElementById('upd-do-backup').onclick=async()=>{
-  await exportSave();
-  document.getElementById('upd-backup-done-msg').style.display='block';
-  document.getElementById('upd-download-row').style.display='flex';
-  document.getElementById('upd-do-backup').textContent='↑ '+t('upd-do-backup').replace('↑ ','')+'  ✓';
-  document.getElementById('upd-do-backup').disabled=true;
-};
+document.getElementById('upd-cancel').onclick=()=>document.getElementById('upd-modal-ov').classList.remove('open');
 document.getElementById('upd-download').onclick=async()=>{
   document.getElementById('upd-download').textContent='…';
   try{
@@ -1069,14 +948,8 @@ document.getElementById('upd-download').onclick=async()=>{
     if(!resp.ok)throw new Error('Download failed');
     const blob=await resp.blob();
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='music_player.html';a.click();
-    toast(t('update-downloaded'));
-    document.getElementById('upd-modal-ov').classList.remove('open');
-    document.getElementById('upd-backup-done-msg').style.display='none';
-    document.getElementById('upd-download-row').style.display='none';
-  }catch{
-    document.getElementById('upd-download').textContent=t('upd-install');
-    toast(t('update-dl-failed'));
-  }
+    toast(t('update-downloaded'));document.getElementById('upd-modal-ov').classList.remove('open');
+  }catch{document.getElementById('upd-download').textContent=t('retry');toast(t('update-dl-failed'));}
 };
 
 async function exportSave(){
@@ -1628,19 +1501,13 @@ document.getElementById('gh-ok').onclick=async()=>{
     if(_importMode==='onedrive')added=await loadFromOneDrive(url);
     else added=await loadFromGithub(url);
     toast(t('added-n',added.length));closeGhModal();
-    localStorage.removeItem('restore-dismissed');
     await promptSaveAsPlaylist(added,_importMode);
   }catch(err){status.className='err';status.textContent=err.message;btn.disabled=false;btn.textContent=t('import');}
 };
 
 const closeImport=()=>document.getElementById('m-import').classList.remove('open');
-document.getElementById('mi-amerigo').onclick=()=>{closeImport();document.getElementById('m-amerigo-sheet').classList.add('open');};
-document.getElementById('m-amerigo-close').onclick=()=>document.getElementById('m-amerigo-sheet').classList.remove('open');
-document.getElementById('m-amerigo-cancel').onclick=()=>document.getElementById('m-amerigo-sheet').classList.remove('open');
-document.getElementById('m-amerigo-open').onclick=()=>{document.getElementById('m-amerigo-sheet').classList.remove('open');pickFiles();};
-document.getElementById('m-amerigo-sheet').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
-document.getElementById('mi-files').onclick=()=>{closeImport();pickFiles();};
-document.getElementById('mi-folder').onclick=()=>{closeImport();pickFolder();};
+document.getElementById('mi-files').onclick=()=>{closeImport();document.getElementById('file-inp').click();};
+document.getElementById('mi-folder').onclick=()=>{closeImport();document.getElementById('folder-inp').click();};
 document.getElementById('mi-github').onclick=()=>{closeImport();openGhModal('github');};
 document.getElementById('mi-onedrive').onclick=()=>{closeImport();openGhModal('onedrive');};
 document.getElementById('mi-check-update').onclick=()=>{closeImport();checkForUpdate(false);};
@@ -1718,51 +1585,14 @@ document.addEventListener('mouseup',()=>seeking=false);
 document.getElementById('vol-slider').oninput=e=>{S.volume=+e.target.value;aud.volume=S.volume;document.getElementById('vol-icon').textContent=S.volume==0?'🔇':S.volume<0.5?'🔉':'🔊';savePrefs();};
 document.getElementById('vol-icon').onclick=()=>{aud.muted=!aud.muted;document.getElementById('vol-icon').textContent=aud.muted?'🔇':S.volume<0.5?'🔉':'🔊';};
 document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click',()=>setView(el.dataset.view)));
-document.getElementById('btn-files').onclick=()=>pickFiles();
-document.getElementById('btn-folder').onclick=()=>pickFolder();
-document.getElementById('import-zone').onclick=()=>pickFiles();
+document.getElementById('btn-files').onclick=()=>document.getElementById('file-inp').click();
+document.getElementById('btn-folder').onclick=()=>document.getElementById('folder-inp').click();
+document.getElementById('import-zone').onclick=()=>document.getElementById('file-inp').click();
 document.getElementById('btn-newpl').onclick=async()=>{const n=await modal(t('new-playlist'),t('pl-name-ph'));if(n){await mkPl(n);toast(t('playlist-created',n));}};
 document.getElementById('btn-savepl').onclick=async()=>{const tr=filteredTracks();if(!tr.length)return;const n=await modal(t('save-as-pl'),t('pl-name-ph'),S.search||t('save-as-pl-ph'));if(n){await mkPl(n,tr.map(tk=>tk.id));toast(t('playlist-created',n));}};
 document.getElementById('btn-shuffleall').onclick=()=>{const tr=filteredTracks();if(!tr.length)return;S.shuffle=true;rebuildQueue(tr.map(tk=>tk.id));updateAll();play(S.queue[0]);savePrefs();};
 document.getElementById('file-inp').onchange=e=>{loadFiles(e.target.files);e.target.value='';};
 document.getElementById('folder-inp').onchange=e=>{loadFiles(e.target.files);e.target.value='';};
-
-const AUDIO_EXTS=['.mp3','.wav','.ogg','.flac','.aac','.m4a','.opus','.weba','.webm'];
-
-async function pickFiles(){
-  if(window.showOpenFilePicker){
-    try{
-      const handles=await window.showOpenFilePicker({multiple:true,types:[{description:'Audio',accept:{'audio/*':AUDIO_EXTS}}]});
-      const files=await Promise.all(handles.map(h=>h.getFile()));
-      loadFiles(files);return;
-    }catch(e){if(e.name==='AbortError')return;}
-  }
-  pickFiles();
-}
-
-async function pickFolder(){
-  if(window.showDirectoryPicker){
-    try{
-      const dir=await window.showDirectoryPicker({mode:'read'});
-      const files=[];
-      async function walk(d){
-        for await(const entry of d.values()){
-          if(entry.kind==='file'){
-            const f=await entry.getFile();
-            if(AUDIO_EXTS.some(x=>f.name.toLowerCase().endsWith(x)))files.push(f);
-          } else if(entry.kind==='directory'){
-            await walk(entry);
-          }
-        }
-      }
-      await walk(dir);
-      if(files.length)loadFiles(files);
-      else toast(t('gh-no-audio'));
-      return;
-    }catch(e){if(e.name==='AbortError')return;}
-  }
-  pickFolder();
-}
 document.getElementById('search-box').addEventListener('input',e=>{S.search=e.target.value;renderDesktopList();document.getElementById('btn-savepl').style.display=(S.view==='all'||S.view==='recent')&&S.search?'block':'none';});
 document.getElementById('btn-sel-mode').onclick=()=>setSelMode(!S.selMode);
 document.getElementById('tl-hdr-num').onclick=()=>{if(S.selected.size===filteredTracks().length)clearSelection();else selectAll();};
@@ -1810,9 +1640,6 @@ if(isIOS&&!isStandalone&&!localStorage.getItem('ios-hint')){
   },3000);
 }
 
-document.getElementById('restore-btn').onclick=()=>{document.getElementById('restore-banner').classList.remove('show');document.getElementById('save-import-inp').click();};
-document.getElementById('restore-dismiss').onclick=()=>{document.getElementById('restore-banner').classList.remove('show');localStorage.setItem('restore-dismissed','1');};
-
 async function init(){
   await openDB();
   S.tracks=(await dbAll('tracks')).sort((a,b)=>a.addedAt-b.addedAt);
@@ -1822,12 +1649,7 @@ async function init(){
   if(S.tracks.length)_tid=Math.max(...S.tracks.map(tk=>tk.id))+1;
   if(S.playlists.length)_pid=Math.max(...S.playlists.map(p=>p.id))+1;
   applyLang();rebuildQueue();setView(S.view);updateAll();renderSidebar();updateCounts();
-  if(S.tracks.length>0||S.playlists.length>0){
-    localStorage.removeItem('restore-dismissed');
-  } else if(!localStorage.getItem('restore-dismissed')){
-    setTimeout(()=>document.getElementById('restore-banner').classList.add('show'),800);
-  }
-  if(navigator.onLine)setTimeout(()=>checkForUpdate(true),1500);
+  if(navigator.onLine)setTimeout(()=>checkForUpdate(true),2000);
 }
 init();
 </script>
