@@ -627,7 +627,7 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
 <audio id="aud" playsinline></audio>
 
 <script>
-const APP_VERSION = '1.0.6';
+const APP_VERSION = '1.0.7';
 const UPDATE_REPO  = 'https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main';
 const UPDATE_FILE_URL = UPDATE_REPO+'/MUSIC%20PLAYER%20APP.html';
 
@@ -862,7 +862,7 @@ function getUrl(tk){if(urls[tk.id])return urls[tk.id];if(tk.fileBlob){urls[tk.id
 async function loadFiles(files){
   const valid=[...files].filter(f=>/\.(mp3|wav|ogg|flac|aac|m4a|opus|weba|webm)$/i.test(f.name));
   if(!valid.length){toast(t('gh-no-audio'));return;}
-  lbar(5);const added=[];
+  lbar(10);const added=[];
   const batchId=++_bid;
   const folderPaths=valid.map(f=>f.webkitRelativePath||'').filter(Boolean);
   const folderName=folderPaths.length?folderPaths[0].split('/')[0]:null;
@@ -872,30 +872,22 @@ async function loadFiles(files){
     const raw=f.name.replace(/\.[^.]+$/,'');
     const{artist,name}=guess(raw);
     const id=++_tid;
-    const url=URL.createObjectURL(f);
-    urls[id]=url;
+    urls[id]=URL.createObjectURL(f);
     const tk={id,name,artist,duration:0,addedAt:Date.now(),fileBlob:f,batchId,batchLabel};
     S.tracks.push(tk);added.push(tk);
-    lbar(5+(i/valid.length)*30);
   }
-  lbar(40);
-  let done=0;
+  lbar(30);let done=0;
   await Promise.all(added.map(tk=>new Promise(res=>{
     const a=new Audio();
     a.src=urls[tk.id];
     a.addEventListener('loadedmetadata',()=>{
       tk.duration=a.duration;
-      done++;
-      lbar(40+(done/added.length)*40);
-      renderBoth();
-      res();
+      done++;lbar(30+(done/added.length)*65);
+      renderBoth();res();
     },{once:true});
     a.addEventListener('error',()=>res(),{once:true});
     a.load();
   })));
-  for(const tk of added){
-    await dbPut('tracks',{id:tk.id,name:tk.name,artist:tk.artist,duration:tk.duration,addedAt:tk.addedAt,fileBlob:tk.fileBlob,batchId:tk.batchId,batchLabel:tk.batchLabel});
-  }
   lbar(100);
   if(S.queue.length===0)rebuildQueue();
   renderBoth();updateCounts();
