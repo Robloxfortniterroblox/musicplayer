@@ -627,8 +627,9 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
 <audio id="aud" playsinline></audio>
 
 <script>
-const APP_VERSION = '1.0.1';
+const APP_VERSION = '1.0.0';
 const UPDATE_REPO  = 'https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main';
+const UPDATE_FILE_URL = UPDATE_REPO+'/MUSIC%20PLAYER%20APP.html';
 
 const LANGS={
   fr:{
@@ -1017,7 +1018,6 @@ async function loadFromOneDrive(url){
 }
 const UPDATE_VERSION_URL=UPDATE_REPO+'/version.txt';
 const UPDATE_CHANGELOG_URL=UPDATE_REPO+'/changelog.txt';
-const UPDATE_FILE_URL=UPDATE_REPO+'/music_player.html';
 
 function semverGt(a,b){
   const pa=a.trim().replace(/^v/,'').split('.').map(Number);
