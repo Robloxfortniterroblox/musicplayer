@@ -543,10 +543,11 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
 <div id="upd-modal-ov"><div id="upd-modal">
   <h2 data-i="upd-title">Mise à jour disponible</h2>
   <p id="upd-version-line" style="font-size:12px;color:var(--fg2);margin-bottom:8px;">v<span id="upd-version"></span></p>
-  <pre id="upd-changelog" style="font-size:11px;color:var(--fg2);max-height:160px;overflow-y:auto;background:var(--bg);padding:10px;margin-bottom:16px;white-space:pre-wrap;font-family:var(--mono);"></pre>
+  <pre id="upd-changelog" style="font-size:11px;color:var(--fg2);max-height:160px;overflow-y:auto;background:var(--bg);padding:10px;margin-bottom:12px;white-space:pre-wrap;font-family:var(--mono);"></pre>
+  <p id="upd-save-hint" data-i="upd-save-hint" style="font-size:11px;color:var(--fg3);margin-bottom:16px;line-height:1.6;"></p>
   <div class="modal-acts">
     <button class="mbtn" id="upd-cancel" data-i="cancel">Annuler</button>
-    <button class="mbtn pri" id="upd-download" data-i="upd-install">Télécharger</button>
+    <button class="mbtn pri" id="upd-download" data-i="upd-install">Appliquer</button>
   </div>
 </div></div>
 
@@ -607,7 +608,7 @@ const LANGS={
     'export-done':'Sauvegarde exportée','import-save-done':(tr,pl)=>`${tr} titre${tr>1?'s':''}, ${pl} playlist${pl>1?'s':''} importé${tr>1?'s':''}`,
     'import-save-failed':'Fichier invalide','export-warning':'Les fichiers locaux devront être ré-importés sur le nouvel appareil.',
     'btn-update':'⟳ mise à jour','btn-export':'↑ exporter','btn-import-save':'↓ importer sauvegarde',
-    'upd-title':'Mise à jour disponible','upd-install':'Télécharger','missing-file':'fichier manquant — ré-importer',
+    'upd-title':'Mise à jour disponible','upd-install':'Appliquer la mise à jour','upd-save-hint':'La mise à jour sera appliquée en direct — tes données sont préservées. Appuie ensuite sur Ctrl+S (ou Cmd+S sur Mac) pour sauvegarder le fichier mis à jour sur le disque.','missing-file':'fichier manquant — ré-importer',
     'gdrive-url-ph':'https://drive.google.com/drive/folders/...',
     'import-gdrive':'Importer depuis Google Drive',
     'gdrive-desc':'Lien vers un dossier Google Drive partagé publiquement. Le dossier doit être accessible à tous.',
@@ -669,7 +670,7 @@ const LANGS={
     'export-done':'Save exported','import-save-done':(tr,pl)=>`${tr} track${tr>1?'s':''}, ${pl} playlist${pl>1?'s':''} imported`,
     'import-save-failed':'Invalid save file','export-warning':'Local files will need to be re-imported on the new device.',
     'btn-update':'⟳ update','btn-export':'↑ export','btn-import-save':'↓ import save',
-    'upd-title':'Update available','upd-install':'Download','missing-file':'missing file — re-import',
+    'upd-title':'Update available','upd-install':'Apply update','upd-save-hint':'The update is applied live — your data is preserved. Then press Ctrl+S (or Cmd+S on Mac) to save the updated file over itself on disk.','missing-file':'missing file — re-import',
     'gdrive-url-ph':'https://drive.google.com/drive/folders/...',
     'import-gdrive':'Import from Google Drive',
     'gdrive-desc':'Link to a publicly shared Google Drive folder. The folder must be accessible to anyone.',
@@ -1030,7 +1031,7 @@ async function loadFromOneDrive(url){
   renderBoth();updateCounts();
   return added;
 }
-const APP_VERSION='1.0.1';
+const APP_VERSION='1.0.2';
 const UPDATE_VERSION_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main/version.txt';
 const UPDATE_CHANGELOG_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main/changelog.txt';
 const UPDATE_FILE_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main/MUSIC%20PLAYER%20APP.html';
@@ -1073,19 +1074,13 @@ document.getElementById('upd-download').onclick=async()=>{
     const resp=await fetch(UPDATE_FILE_URL+'?_='+Date.now());
     if(!resp.ok)throw new Error('Download failed');
     const newHTML=await resp.text();
-
-    // 1. Save file to disk so the on-disk copy is updated too
-    const blob=new Blob([newHTML],{type:'text/html'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MUSIC PLAYER APP.html';a.click();
-
-    // 2. Overwrite the live page with the new code — DB survives because file path is unchanged
-    // Small delay so the download has time to trigger before the page is replaced
-    setTimeout(()=>{
-      document.open();
-      document.write(newHTML);
-      document.close();
-    },400);
-
+    // Live-swap the page code. The IndexedDB is tied to this file's path,
+    // so all data survives. The user then presses Ctrl+S / Cmd+S to save
+    // the updated code back to the same file on disk.
+    document.open();
+    document.write(newHTML);
+    document.close();
+    // This toast runs in the new document context after write
   }catch{
     btn.disabled=false;
     btn.textContent=t('retry');
