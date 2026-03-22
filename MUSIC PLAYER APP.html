@@ -586,7 +586,7 @@ const LANGS={
     'save-import-title':'Enregistrer comme playlist ?',
     'save-import-msg':(n)=>`Tu viens d'importer ${n} titre${n>1?'s':''}. Veux-tu les enregistrer comme playlist ?`,
     'save-import-name':'Nom de la playlist','save-import-yes':'Enregistrer','save-import-no':'Non merci',
-    'playlist-created':(n)=>`Playlist "${n}" créée`,'track-deleted':'Titre supprimé',
+    'playlist-created':(n)=>`Playlist "${n}" créée`,'playlist-updated':(n)=>`Playlist "${n}" mise à jour`,'track-deleted':'Titre supprimé',
     'pl-deleted':'Playlist supprimée','play-next':'Sera lu ensuite','queue-added':"Ajouté à la file",
     'random':'Lecture aléatoire','installed':'Application installée !',
     'ios-hint':"Appuie sur ⬆ puis \"Sur l'écran d'accueil\"",
@@ -601,7 +601,7 @@ const LANGS={
     'all-selected':'Tous sélectionnés','none-selected':'Aucun sélectionné',
     'import-batch':'importé','local-batch':'local','github-batch':'github',
     'unknown-batch':'import',
-    'add-to-current':'Ajouter à la playlist actuelle',
+    'add-to-current':'Ajouter à la playlist actuelle','create-new-pl':'+ Créer une nouvelle playlist',
     'gdrive-invalid':'Lien Google Drive invalide','gdrive-access':'Accès refusé (dossier privé)','gdrive-err':(c)=>`Erreur Drive (${c})`,'gdrive-batch':'Google Drive',
     'up-to-date':'Déjà à jour','update-check-failed':'Vérification impossible','no-changelog':'Pas de changelog',
     'update-downloaded':'Mise à jour appliquée — rechargement…','retry':'Réessayer','update-dl-failed':'Téléchargement échoué',
@@ -648,7 +648,7 @@ const LANGS={
     'save-import-title':'Save as playlist?',
     'save-import-msg':(n)=>`You just imported ${n} track${n>1?'s':''}. Do you want to save them as a playlist?`,
     'save-import-name':'Playlist name','save-import-yes':'Save','save-import-no':'No thanks',
-    'playlist-created':(n)=>`Playlist "${n}" created`,'track-deleted':'Track deleted',
+    'playlist-created':(n)=>`Playlist "${n}" created`,'playlist-updated':(n)=>`Playlist "${n}" updated`,'track-deleted':'Track deleted',
     'pl-deleted':'Playlist deleted','play-next':'Will play next','queue-added':'Added to queue',
     'random':'Shuffle','installed':'App installed!',
     'ios-hint':'Tap ⬆ then "Add to Home Screen"',
@@ -663,7 +663,7 @@ const LANGS={
     'all-selected':'All selected','none-selected':'None selected',
     'import-batch':'imported','local-batch':'local','github-batch':'github',
     'unknown-batch':'import',
-    'add-to-current':'Add to current playlist',
+    'add-to-current':'Add to current playlist','create-new-pl':'+ Create new playlist',
     'gdrive-invalid':'Invalid Google Drive link','gdrive-access':'Access denied (folder is private)','gdrive-err':(c)=>`Drive error (${c})`,'gdrive-batch':'Google Drive',
     'up-to-date':'Already up to date','update-check-failed':'Update check failed','no-changelog':'No changelog available',
     'update-downloaded':'Update applied — reloading…','retry':'Retry','update-dl-failed':'Download failed',
@@ -1031,7 +1031,7 @@ async function loadFromOneDrive(url){
   renderBoth();updateCounts();
   return added;
 }
-const APP_VERSION='1.0.2';
+const APP_VERSION='1.0.3';
 const UPDATE_VERSION_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main/version.txt';
 const UPDATE_CHANGELOG_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main/changelog.txt';
 const UPDATE_FILE_URL='https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main/MUSIC%20PLAYER%20APP.html';
@@ -1189,7 +1189,13 @@ async function promptSaveAsPlaylist(added,source){
   } else {
     const pid=+choice;
     const pl=S.playlists.find(p=>p.id===pid);
-    if(pl){added.forEach(tk=>{if(!pl.trackIds.includes(tk.id))pl.trackIds.push(tk.id);});await savePl(pl);renderSidebar();toast(t('playlist-created',pl.name));}
+    if(pl){
+      added.forEach(tk=>{if(!pl.trackIds.includes(tk.id))pl.trackIds.push(tk.id);});
+      await savePl(pl);
+      renderSidebar();
+      renderBoth();
+      toast(t('playlist-updated',pl.name));
+    }
   }
 }
 
@@ -1224,7 +1230,7 @@ function playlistDropdownChoice({title,msg,playlists,currentPlaylistId,newLabel,
   });
   // "New playlist" option
   const onew=document.createElement('option');
-  onew.value='new';onew.textContent=`+ ${newLabel}`;
+  onew.value='new';onew.textContent=t('create-new-pl');
   sel.appendChild(onew);
 
   const acts=document.getElementById('confirm-acts');acts.innerHTML='';acts.style.flexDirection='';
@@ -1567,7 +1573,7 @@ function openCtx(e,id){
   ctxEl.querySelector('#cx-play').onclick=()=>{closeCtx();rebuildQueue();play(id);};
   ctxEl.querySelector('#cx-nxt').onclick=()=>{closeCtx();S.queue.splice(S.queueIndex+1,0,id);updateCounts();toast(t('play-next'));};
   ctxEl.querySelector('#cx-q').onclick=()=>{closeCtx();S.queue.push(id);updateCounts();toast(t('queue-added'));};
-  ctxEl.querySelectorAll('.cx-pl').forEach(el=>el.onclick=async()=>{closeCtx();const pl=S.playlists.find(p=>p.id===+el.dataset.pid);if(pl&&!pl.trackIds.includes(id)){pl.trackIds.push(id);await savePl(pl);renderSidebar();toast(t('playlist-created',pl.name));}});
+  ctxEl.querySelectorAll('.cx-pl').forEach(el=>el.onclick=async()=>{closeCtx();const pl=S.playlists.find(p=>p.id===+el.dataset.pid);if(pl&&!pl.trackIds.includes(id)){pl.trackIds.push(id);await savePl(pl);renderSidebar();renderBoth();toast(t('playlist-updated',pl.name));}});
   ctxEl.querySelector('#cx-npl').onclick=async()=>{closeCtx();const n=await modal(t('new-playlist'),t('pl-name-ph'));if(n){await mkPl(n,[id]);toast(t('playlist-created',n));}};
   ctxEl.querySelector('#cx-del').onclick=async()=>{closeCtx();await deleteTrack(id);};
 }
@@ -1600,7 +1606,7 @@ function openTrackActions(id){
     {ico:'▶',label:t('play-now'),fn:()=>{rebuildQueue();play(id);}},
     {ico:'⏭',label:t('play-next-action'),fn:()=>{S.queue.splice(S.queueIndex+1,0,id);updateCounts();toast(t('play-next'));}},
     {ico:'≡',label:t('add-queue'),fn:()=>{S.queue.push(id);updateCounts();toast(t('queue-added'));}},
-    ...S.playlists.map(p=>({ico:'♬',label:t('add-to')+p.name,fn:async()=>{if(!p.trackIds.includes(id)){p.trackIds.push(id);await savePl(p);renderSidebar();toast(t('playlist-created',p.name));}}})),
+    ...S.playlists.map(p=>({ico:'♬',label:t('add-to')+p.name,fn:async()=>{if(!p.trackIds.includes(id)){p.trackIds.push(id);await savePl(p);renderSidebar();renderBoth();toast(t('playlist-updated',p.name));}}})),
     {ico:'+',label:t('new-pl-with'),fn:async()=>{const n=await modal(t('new-playlist'),t('pl-name-ph'));if(n){await mkPl(n,[id]);toast(t('playlist-created',n));}}},
     {ico:'✕',label:t('delete'),danger:true,fn:async()=>await deleteTrack(id)},
   ];
