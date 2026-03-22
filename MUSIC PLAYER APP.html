@@ -622,12 +622,12 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--san
 
 <div id="ctx"></div>
 <div id="toast"></div>
-<input type="file" id="file-inp" multiple accept=".mp3,.wav,.ogg,.flac,.aac,.m4a,.opus,.weba,.webm,audio/mpeg,audio/wav,audio/ogg,audio/flac,audio/aac,audio/mp4,audio/x-m4a,audio/opus,audio/webm" style="display:none">
-<input type="file" id="folder-inp" multiple webkitdirectory accept=".mp3,.wav,.ogg,.flac,.aac,.m4a,.opus,.weba,.webm,audio/mpeg,audio/wav,audio/ogg,audio/flac,audio/aac,audio/mp4,audio/x-m4a,audio/opus,audio/webm" style="display:none">
+<input type="file" id="file-inp" multiple accept=".mp3,.wav,.ogg,.flac,.aac,.m4a,.opus,.weba,.webm" style="display:none">
+<input type="file" id="folder-inp" multiple webkitdirectory style="display:none">
 <audio id="aud" playsinline></audio>
 
 <script>
-const APP_VERSION = '1.0.2';
+const APP_VERSION = '1.0.3';
 const UPDATE_REPO  = 'https://raw.githubusercontent.com/Robloxfortniterroblox/musicplayer/main';
 const UPDATE_FILE_URL = UPDATE_REPO+'/MUSIC%20PLAYER%20APP.html';
 
@@ -1637,10 +1637,10 @@ const closeImport=()=>document.getElementById('m-import').classList.remove('open
 document.getElementById('mi-amerigo').onclick=()=>{closeImport();document.getElementById('m-amerigo-sheet').classList.add('open');};
 document.getElementById('m-amerigo-close').onclick=()=>document.getElementById('m-amerigo-sheet').classList.remove('open');
 document.getElementById('m-amerigo-cancel').onclick=()=>document.getElementById('m-amerigo-sheet').classList.remove('open');
-document.getElementById('m-amerigo-open').onclick=()=>{document.getElementById('m-amerigo-sheet').classList.remove('open');document.getElementById('file-inp').click();};
+document.getElementById('m-amerigo-open').onclick=()=>{document.getElementById('m-amerigo-sheet').classList.remove('open');pickFiles();};
 document.getElementById('m-amerigo-sheet').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
-document.getElementById('mi-files').onclick=()=>{closeImport();document.getElementById('file-inp').click();};
-document.getElementById('mi-folder').onclick=()=>{closeImport();document.getElementById('folder-inp').click();};
+document.getElementById('mi-files').onclick=()=>{closeImport();pickFiles();};
+document.getElementById('mi-folder').onclick=()=>{closeImport();pickFolder();};
 document.getElementById('mi-github').onclick=()=>{closeImport();openGhModal('github');};
 document.getElementById('mi-onedrive').onclick=()=>{closeImport();openGhModal('onedrive');};
 document.getElementById('mi-check-update').onclick=()=>{closeImport();checkForUpdate(false);};
@@ -1718,14 +1718,51 @@ document.addEventListener('mouseup',()=>seeking=false);
 document.getElementById('vol-slider').oninput=e=>{S.volume=+e.target.value;aud.volume=S.volume;document.getElementById('vol-icon').textContent=S.volume==0?'🔇':S.volume<0.5?'🔉':'🔊';savePrefs();};
 document.getElementById('vol-icon').onclick=()=>{aud.muted=!aud.muted;document.getElementById('vol-icon').textContent=aud.muted?'🔇':S.volume<0.5?'🔉':'🔊';};
 document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click',()=>setView(el.dataset.view)));
-document.getElementById('btn-files').onclick=()=>document.getElementById('file-inp').click();
-document.getElementById('btn-folder').onclick=()=>document.getElementById('folder-inp').click();
-document.getElementById('import-zone').onclick=()=>document.getElementById('file-inp').click();
+document.getElementById('btn-files').onclick=()=>pickFiles();
+document.getElementById('btn-folder').onclick=()=>pickFolder();
+document.getElementById('import-zone').onclick=()=>pickFiles();
 document.getElementById('btn-newpl').onclick=async()=>{const n=await modal(t('new-playlist'),t('pl-name-ph'));if(n){await mkPl(n);toast(t('playlist-created',n));}};
 document.getElementById('btn-savepl').onclick=async()=>{const tr=filteredTracks();if(!tr.length)return;const n=await modal(t('save-as-pl'),t('pl-name-ph'),S.search||t('save-as-pl-ph'));if(n){await mkPl(n,tr.map(tk=>tk.id));toast(t('playlist-created',n));}};
 document.getElementById('btn-shuffleall').onclick=()=>{const tr=filteredTracks();if(!tr.length)return;S.shuffle=true;rebuildQueue(tr.map(tk=>tk.id));updateAll();play(S.queue[0]);savePrefs();};
 document.getElementById('file-inp').onchange=e=>{loadFiles(e.target.files);e.target.value='';};
 document.getElementById('folder-inp').onchange=e=>{loadFiles(e.target.files);e.target.value='';};
+
+const AUDIO_EXTS=['.mp3','.wav','.ogg','.flac','.aac','.m4a','.opus','.weba','.webm'];
+
+async function pickFiles(){
+  if(window.showOpenFilePicker){
+    try{
+      const handles=await window.showOpenFilePicker({multiple:true,types:[{description:'Audio',accept:{'audio/*':AUDIO_EXTS}}]});
+      const files=await Promise.all(handles.map(h=>h.getFile()));
+      loadFiles(files);return;
+    }catch(e){if(e.name==='AbortError')return;}
+  }
+  pickFiles();
+}
+
+async function pickFolder(){
+  if(window.showDirectoryPicker){
+    try{
+      const dir=await window.showDirectoryPicker({mode:'read'});
+      const files=[];
+      async function walk(d){
+        for await(const entry of d.values()){
+          if(entry.kind==='file'){
+            const f=await entry.getFile();
+            if(AUDIO_EXTS.some(x=>f.name.toLowerCase().endsWith(x)))files.push(f);
+          } else if(entry.kind==='directory'){
+            await walk(entry);
+          }
+        }
+      }
+      await walk(dir);
+      if(files.length)loadFiles(files);
+      else toast(t('gh-no-audio'));
+      return;
+    }catch(e){if(e.name==='AbortError')return;}
+  }
+  pickFolder();
+}
 document.getElementById('search-box').addEventListener('input',e=>{S.search=e.target.value;renderDesktopList();document.getElementById('btn-savepl').style.display=(S.view==='all'||S.view==='recent')&&S.search?'block':'none';});
 document.getElementById('btn-sel-mode').onclick=()=>setSelMode(!S.selMode);
 document.getElementById('tl-hdr-num').onclick=()=>{if(S.selected.size===filteredTracks().length)clearSelection();else selectAll();};
@@ -1790,7 +1827,7 @@ async function init(){
   } else if(!localStorage.getItem('restore-dismissed')){
     setTimeout(()=>document.getElementById('restore-banner').classList.add('show'),800);
   }
-  if(navigator.onLine)setTimeout(()=>checkForUpdate(true),2000);
+  if(navigator.onLine)setTimeout(()=>checkForUpdate(true),1500);
 }
 init();
 </script>
